@@ -24,7 +24,7 @@
 
 
 // *************************************************************************
-//  Scrambler.bsv 
+//  Scrambler.bsv
 // *************************************************************************
 import DataTypes::*;
 import Interfaces::*;
@@ -38,7 +38,7 @@ interface Scrambler#(type n);
    method Action fromControl(RateData#(n) x);
 
    //outputs
-   method ActionValue#(RateData#(n))  toEncoder(); 
+   method ActionValue#(RateData#(n))  toEncoder();
 endinterface
 
 (* synthesize *)
@@ -59,25 +59,27 @@ module mkScrambler(Scrambler#(n));
 			  R4   : return 7'b1001011;
 			  RNone: return seqR;
 		       endcase;
-   
+
      Bit#(7) scram_seq = headSeq;
-   
+
      Bit#(1) newS;
      Bit#(n) inData  = x.data;
      Bit#(n) outData = 0;
-     
+
      for(Integer i = 0; i < valueOf(n); i = i + 1)
 	begin
 	   newS = scram_seq[0] ^ scram_seq[3];
 	   outData[i] = newS ^ inData[i];
 	   scram_seq = {newS,scram_seq[6:1]};
-	end       
-   
+	end
+
+     seqR <= scram_seq;
+
      outQ.enq(RateData{
 	rate: x.rate,
 	data: outData
-	});	     
-	
+	});
+
    endmethod
 
    method ActionValue#(RateData#(n)) toEncoder();
